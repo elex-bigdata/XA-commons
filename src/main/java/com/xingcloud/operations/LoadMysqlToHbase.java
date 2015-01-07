@@ -34,7 +34,9 @@ public class LoadMysqlToHbase {
 
     public static void main(String[] args) {
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
-        List<String> projects = lmth.getAllProjects();
+//        List<String> projects = lmth.getAllProjects();
+        List<String> projects = new ArrayList<String>();
+        projects.add("v9");
         lmth.load(projects);
     }
 
