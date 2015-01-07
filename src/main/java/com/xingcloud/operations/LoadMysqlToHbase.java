@@ -186,7 +186,8 @@ public class LoadMysqlToHbase {
                 String dir = Constants.local_path_mysql_dump + project + "/";
                 String dump_command = "";
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(project);
-                for(UserProp up : userProps) {
+                /*for(UserProp up : userProps) {
+                    System.out.println("table name-----------" + up);
                     Runtime rt = Runtime.getRuntime();
                     dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up + " --tab=" + dir;
                     String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
@@ -197,6 +198,9 @@ public class LoadMysqlToHbase {
 
                     fileName = dir + up + ".txt";
                     loadToHBase(fileName);
+                }*/
+                for(UserProp up : userProps) {
+                    System.out.println("table name-----------" + up);
                 }
                 LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - t1) + "ms");
 
