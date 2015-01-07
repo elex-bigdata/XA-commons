@@ -184,20 +184,25 @@ public class LoadMysqlToHbase {
             LOG.info("Begin to dump and load database: 16_" + project);
             long t1 = System.currentTimeMillis();
             try {
-                String dir = Constants.local_path_mysql_dump + project + "/";
+                String des = Constants.local_path_mysql_dump + project + "/";
+                File dir = new File(des);
+                if(!dir.exists()) {
+                    dir.mkdir();
+                    Runtime.getRuntime().exec("sudo chmod 777 " + des);
+                }
                 String dump_command = "";
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(project);
                 for(UserProp up : userProps) {
                     System.out.println("table name-----------" + up.getPropName());
                     Runtime rt = Runtime.getRuntime();
-                    dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + dir;
+                    dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + des;
                     String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
                     Process process = rt.exec(cmds);
                     int result = process.waitFor();
                     if (result != 0)
                         throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
 
-                    fileName = dir + up + ".txt";
+                    fileName = des + up + ".txt";
                     System.out.println("table file name-----------" + fileName);
 //                    loadToHBase(fileName);
                 }
