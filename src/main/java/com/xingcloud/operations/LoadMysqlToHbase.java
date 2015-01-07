@@ -46,6 +46,7 @@ public class LoadMysqlToHbase {
             DumpWorker dumpWorker = new DumpWorker(pro);
             service.submit(dumpWorker);
         }
+        service.shutdown();
     }
 
     public List<String> getAllProjects() {
@@ -200,7 +201,7 @@ public class LoadMysqlToHbase {
                     loadToHBase(fileName);
                 }*/
                 for(UserProp up : userProps) {
-                    System.out.println("table name-----------" + up);
+                    System.out.println("table name-----------" + up.getPropName());
                 }
                 LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - t1) + "ms");
 
