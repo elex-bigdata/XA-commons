@@ -190,8 +190,8 @@ public class LoadMysqlToHbase {
                 puts.add(put);
             }
         }
-
-        if (userProp.getPropFunc() == UpdateFunc.cover) {
+        table.put(puts);
+        /*if (userProp.getPropFunc() == UpdateFunc.cover) {
             table.put(puts);
         } else if (userProp.getPropFunc() == UpdateFunc.once) {
             for (Put put : puts) {
@@ -201,7 +201,7 @@ public class LoadMysqlToHbase {
             for (Map.Entry<byte[], String> user : users.entrySet()) {
                 table.incrementColumnValue(user.getKey(), Constants.USER_COLUMNFAMILY.getBytes(), Constants.USER_QUALIFIER.getBytes(), Long.parseLong(user.getValue()), false);
             }
-        }
+        }*/
         LOG.info("load table : 16_" + pid + "." + attr + " to hbase using " + (System.currentTimeMillis() - currentTime) + "ms");
 
     }
@@ -218,7 +218,7 @@ public class LoadMysqlToHbase {
         @Override
         public void run() {
             LOG.info("Begin to dump and load database: 16_" + project);
-            long t1 = System.currentTimeMillis();
+            long dumpT1 = System.currentTimeMillis();
             try {
                 String des = Constants.local_path_mysql_dump + project + "/";
                 File dir = new File(des);
@@ -229,7 +229,9 @@ public class LoadMysqlToHbase {
                 String dump_command = "";
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(project);
                 for(UserProp up : userProps) {
+                    long dumpT2 = System.currentTimeMillis();
                     System.out.println("table name-----------" + up.getPropName());
+                    LOG.info("start to dump table-----------" + up.getPropName());
                     Runtime rt = Runtime.getRuntime();
                     dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + des;
                     String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
@@ -237,6 +239,7 @@ public class LoadMysqlToHbase {
                     int result = process.waitFor();
                     if (result != 0)
                         throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
+                    LOG.info("dump table-----------" + up.getPropName() + "  using: " + (System.currentTimeMillis() - dumpT2) + "ms");
 
                     fileName = des + up.getPropName() + ".txt";
                     System.out.println("table file name-----------" + fileName);
@@ -244,7 +247,7 @@ public class LoadMysqlToHbase {
                     loadToHBase(fileName, project, up);
                 }
 
-                LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - t1) + "ms");
+                LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - dumpT1) + "ms");
 
             } catch (Exception e) {
                 e.printStackTrace();
