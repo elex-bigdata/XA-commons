@@ -4,6 +4,9 @@ import com.xingcloud.mysql.MySqlResourceManager;
 import com.xingcloud.mysql.UpdateFunc;
 import com.xingcloud.mysql.UserProp;
 import com.xingcloud.operations.utils.Constants;
+import com.xingcloud.operations.utils.Log4jProperties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
@@ -30,13 +33,14 @@ import java.util.concurrent.Executors;
  * Created by wanghaixing on 15-1-6.
  */
 public class LoadMysqlToHbase {
-    private static final Logger LOG = Logger.getLogger(LoadMysqlToHbase.class);
+    private static final Log LOG = LogFactory.getLog(LoadMysqlToHbase.class);
 
     public static void main(String[] args) {
+        Log4jProperties.init();
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
-        projects.add("v9");
+        projects.add("22find");
         lmth.load(projects);
     }
 
@@ -102,22 +106,26 @@ public class LoadMysqlToHbase {
         return upMap;
     }
 
-    public void loadToHBase(String fileName) throws Exception{
+    public void loadToHBase(String fileName, String pid, UserProp userProp) throws Exception{
         LOG.info("read file :   " + fileName);
         long currentTime = System.currentTimeMillis();
-        String[] dirs = fileName.split("/");
-        int len = dirs.length;
 
+        /*String[] dirs = fileName.split("/");
+        int len = dirs.length;
         String pid = dirs[len-2];
         String attr = dirs[len-1];
+        int attr_len = attr.length();
+        attr = attr.substring(0, attr_len-4);*/
+
         String record = "";
         BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
         String[] items = null;
         byte[] rowkey = null;
 
-        Map<String, UserProp> userPropMap = getUserPropMap(pid);
-        UserProp userProp = userPropMap.get(attr);
+//        Map<String, UserProp> userPropMap = getUserPropMap(pid);
+//        UserProp userProp = userPropMap.get(attr);
 
+        String attr = userProp.getPropName();
         LOG.info("Begin to load table : 16_" + pid + "." + attr + " to hbase...");
         String node = InetAddress.getLocalHost().getHostAddress();
         Configuration conf = HBaseConfiguration.create();
@@ -171,7 +179,7 @@ public class LoadMysqlToHbase {
     }
 
     class DumpWorker implements Runnable {
-        private final Logger LOG = Logger.getLogger(DumpWorker.class);
+        private final Log LOG = LogFactory.getLog(DumpWorker.class);
         private String project;
         private String fileName;
 
@@ -202,9 +210,9 @@ public class LoadMysqlToHbase {
                     if (result != 0)
                         throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
 
-                    fileName = des + up + ".txt";
+                    fileName = des + up.getPropName() + ".txt";
                     System.out.println("table file name-----------" + fileName);
-//                    loadToHBase(fileName);
+                    loadToHBase(fileName, project, up);
                 }
 
                 LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - t1) + "ms");
