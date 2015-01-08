@@ -40,7 +40,7 @@ public class LoadMysqlToHbase {
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
-        projects.add("22find");
+        projects.add("v9");
         lmth.load(projects);
     }
 
@@ -106,7 +106,7 @@ public class LoadMysqlToHbase {
         return upMap;
     }
 
-    public void loadToHBase(String fileName, String pid, UserProp userProp) throws Exception{
+    public void loadToHBase(String fileName, String pid, UserProp userProp) throws Exception {
         LOG.info("read file :   " + fileName);
         long currentTime = System.currentTimeMillis();
 
@@ -139,6 +139,7 @@ public class LoadMysqlToHbase {
         Map<byte[], String> users = new HashMap<byte[], String>();
 
         while((record = br.readLine()) != null) {
+            System.out.println("--------------------------" + record);
             items = record.split("\t");
             if(items != null && items.length ==2) {
                 rowkey = createRowKey(pid, attr, Long.parseLong(items[0]));
@@ -201,7 +202,7 @@ public class LoadMysqlToHbase {
                 String dump_command = "";
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(project);
                 for(UserProp up : userProps) {
-                    System.out.println("table name-----------" + up.getPropName());
+                    /*System.out.println("table name-----------" + up.getPropName());
                     Runtime rt = Runtime.getRuntime();
                     dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + des;
                     String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
@@ -211,7 +212,7 @@ public class LoadMysqlToHbase {
                         throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
 
                     fileName = des + up.getPropName() + ".txt";
-                    System.out.println("table file name-----------" + fileName);
+                    System.out.println("table file name-----------" + fileName);*/
                     loadToHBase(fileName, project, up);
                 }
 
