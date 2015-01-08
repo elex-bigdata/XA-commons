@@ -213,6 +213,7 @@ public class LoadMysqlToHbase {
 
                     fileName = des + up.getPropName() + ".txt";
                     System.out.println("table file name-----------" + fileName);*/
+                    fileName = des + up.getPropName() + ".txt";
                     loadToHBase(fileName, project, up);
                 }
 
