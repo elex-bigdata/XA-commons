@@ -62,7 +62,7 @@ public class LoadMysqlToHbase {
         for(Result r : scanner) {
             byte[] rowkey = r.getRow();
             long uid = Bytes.toLong(Bytes.tail(rowkey, 8));
-            System.out.println(String.valueOf(uid) + "\t" + Bytes.toLong(r.getValue(Bytes.toBytes(Constants.USER_COLUMNFAMILY), Bytes.toBytes(Constants.USER_QUALIFIER))));       // + "\t" + Bytes.toLong(r.getValue(columnfamily, qualifier))
+            System.out.println(String.valueOf(uid) + "\t" + Bytes.toString(r.getValue(Bytes.toBytes(Constants.USER_COLUMNFAMILY), Bytes.toBytes(Constants.USER_QUALIFIER))));       // + "\t" + Bytes.toLong(r.getValue(columnfamily, qualifier))
         }
     }
 
