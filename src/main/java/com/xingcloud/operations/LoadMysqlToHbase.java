@@ -166,7 +166,7 @@ public class LoadMysqlToHbase {
         Map<byte[], String> users = new HashMap<byte[], String>();
 
         while((record = br.readLine()) != null) {
-            System.out.println("--------------------------" + record);
+//            System.out.println("--------------------------" + record);
             items = record.split("\t");
             if(items != null && items.length ==2) {
                 rowkey = createRowKey(pid, attr, Long.parseLong(items[0]));
