@@ -9,8 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
@@ -35,13 +34,36 @@ import java.util.concurrent.Executors;
 public class LoadMysqlToHbase {
     private static final Log LOG = LogFactory.getLog(LoadMysqlToHbase.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         Log4jProperties.init();
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
         projects.add("v9");
-        lmth.load(projects);
+//        lmth.load(projects);
+        lmth.test();
+    }
+
+    public void test() throws Exception{
+        String node = InetAddress.getLocalHost().getHostAddress();
+        Configuration conf = HBaseConfiguration.create();
+        conf.set("hbase.zookeeper.quorum", node);
+        conf.set("hbase.zookeeper.property.clientPort", Constants.HBASE_PORT);
+        HTable table = new HTable(conf, Constants.ATTRIBUTE_TABLE);
+        Scan scan = new Scan();
+        int pidDict = Constants.dict.getPidDict("v9");
+        int attrDict = Constants.dict.getAttributeDict("browserVersion");
+        byte[] startKey = Bytes.add(Bytes.toBytes(pidDict), Bytes.toBytes(attrDict));
+        byte[] endKey = Bytes.add(Bytes.toBytes(pidDict), Bytes.toBytes(attrDict + 1));
+        scan.setStartRow(startKey);
+        scan.setStopRow(endKey);
+        scan.addColumn(Bytes.toBytes(Constants.USER_COLUMNFAMILY), Bytes.toBytes(Constants.USER_QUALIFIER));
+        ResultScanner scanner = table.getScanner(scan);
+        for(Result r : scanner) {
+            byte[] rowkey = r.getRow();
+            long uid = Bytes.toLong(Bytes.tail(rowkey, 8));
+            System.out.println(String.valueOf(uid) + "\t" + Bytes.toLong(r.getValue(Bytes.toBytes(Constants.USER_COLUMNFAMILY), Bytes.toBytes(Constants.USER_QUALIFIER))));       // + "\t" + Bytes.toLong(r.getValue(columnfamily, qualifier))
+        }
     }
 
     public void load(List<String> projects) {
