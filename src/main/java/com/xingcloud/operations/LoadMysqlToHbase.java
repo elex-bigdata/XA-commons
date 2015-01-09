@@ -4,6 +4,7 @@ import com.xingcloud.mysql.MySqlResourceManager;
 import com.xingcloud.mysql.UpdateFunc;
 import com.xingcloud.mysql.UserProp;
 import com.xingcloud.operations.utils.Constants;
+import com.xingcloud.operations.utils.HBaseUtil;
 import com.xingcloud.operations.utils.Log4jProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,25 +37,24 @@ public class LoadMysqlToHbase {
 
     public static void main(String[] args) throws Exception{
         Log4jProperties.init();
+        HBaseUtil.init();
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
-        projects.add("v9");
+        projects.add("sof-installer");
         String cmd = args[0];
         if (cmd.equals("load")) {
             lmth.load(projects);
         } else if(cmd.equals("test")) {
             lmth.test();
         }
+        HBaseUtil.closeAll();
 
     }
 
     public void test() throws Exception{
-        String node = InetAddress.getLocalHost().getHostAddress();
-        Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum", node);
-        conf.set("hbase.zookeeper.property.clientPort", Constants.HBASE_PORT);
-        HTable table = new HTable(conf, Constants.ATTRIBUTE_TABLE);
+
+        HTableInterface table = HBaseUtil.getHTable(Constants.ATTRIBUTE_TABLE);
         Scan scan = new Scan();
         int pidDict = Constants.dict.getPidDict("v9");
         int attrDict = Constants.dict.getAttributeDict("browser");
@@ -69,6 +69,9 @@ public class LoadMysqlToHbase {
             long uid = Bytes.toLong(Bytes.tail(rowkey, 8));
             System.out.println(String.valueOf(uid) + "\t" + Bytes.toString(r.getValue(Bytes.toBytes(Constants.USER_COLUMNFAMILY), Bytes.toBytes(Constants.USER_QUALIFIER))));       // + "\t" + Bytes.toLong(r.getValue(columnfamily, qualifier))
         }
+        scanner.close();
+        table.close();
+
     }
 
     public void load(List<String> projects) {
@@ -112,8 +115,6 @@ public class LoadMysqlToHbase {
         return projects;
     }
 
-
-
     private byte[] createRowKey(String pid, String attr, long uid) throws Exception {
         int pidDict = Constants.dict.getPidDict(pid);
         int attrDict = Constants.dict.getAttributeDict(attr);
@@ -134,43 +135,30 @@ public class LoadMysqlToHbase {
     }
 
     public void loadToHBase(String fileName, String pid, UserProp userProp) throws Exception {
+
+
         LOG.info("read file :   " + fileName);
         long currentTime = System.currentTimeMillis();
-
-        /*String[] dirs = fileName.split("/");
-        int len = dirs.length;
-        String pid = dirs[len-2];
-        String attr = dirs[len-1];
-        int attr_len = attr.length();
-        attr = attr.substring(0, attr_len-4);*/
 
         String record = "";
         BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
         String[] items = null;
         byte[] rowkey = null;
 
-//        Map<String, UserProp> userPropMap = getUserPropMap(pid);
-//        UserProp userProp = userPropMap.get(attr);
-
         String attr = userProp.getPropName();
         LOG.info("Begin to load table : 16_" + pid + "." + attr + " to hbase...");
-        String node = InetAddress.getLocalHost().getHostAddress();
-        Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum", node);
-        conf.set("hbase.zookeeper.property.clientPort", Constants.HBASE_PORT);
-        HTable table = new HTable(conf, Constants.ATTRIBUTE_TABLE);
+
+        //get htable from htablepool
+        HTableInterface table = HBaseUtil.getHTable(Constants.ATTRIBUTE_TABLE);
         table.setAutoFlush(false);
         table.setWriteBufferSize(Constants.WRITE_BUFFER_SIZE);
         List<Put> puts = new ArrayList<Put>();
-
-        Map<byte[], String> users = new HashMap<byte[], String>();
 
         while((record = br.readLine()) != null) {
 //            System.out.println("--------------------------" + record);
             items = record.split("\t");
             if(items != null && items.length ==2) {
                 rowkey = createRowKey(pid, attr, Long.parseLong(items[0]));
-                users.put(rowkey, items[1]);
 
                 Put put = new Put(rowkey);
                 put.setWriteToWAL(Constants.TableWalSwitch);
@@ -191,17 +179,8 @@ public class LoadMysqlToHbase {
             }
         }
         table.put(puts);
-        /*if (userProp.getPropFunc() == UpdateFunc.cover) {
-            table.put(puts);
-        } else if (userProp.getPropFunc() == UpdateFunc.once) {
-            for (Put put : puts) {
-                table.checkAndPut(put.getRow(), Constants.USER_COLUMNFAMILY.getBytes(), Constants.USER_QUALIFIER.getBytes(), null, put);
-            }
-        } else if (userProp.getPropFunc() == UpdateFunc.inc) {
-            for (Map.Entry<byte[], String> user : users.entrySet()) {
-                table.incrementColumnValue(user.getKey(), Constants.USER_COLUMNFAMILY.getBytes(), Constants.USER_QUALIFIER.getBytes(), Long.parseLong(user.getValue()), false);
-            }
-        }*/
+        table.close();
+
         LOG.info("load table : 16_" + pid + "." + attr + " to hbase using " + (System.currentTimeMillis() - currentTime) + "ms");
 
     }
@@ -209,7 +188,6 @@ public class LoadMysqlToHbase {
     class DumpWorker implements Runnable {
         private final Log LOG = LogFactory.getLog(DumpWorker.class);
         private String project;
-        private String fileName;
 
         public DumpWorker(String project) {
             this.project = project;
@@ -220,33 +198,17 @@ public class LoadMysqlToHbase {
             LOG.info("Begin to dump and load database: 16_" + project);
             long dumpT1 = System.currentTimeMillis();
             try {
-                String des = Constants.local_path_mysql_dump + project + "/";
-                File dir = new File(des);
-                if(!dir.exists()) {
-                    dir.mkdir();
-                    Runtime.getRuntime().exec("sudo chmod 777 " + des);
-                }
+
+                ExecutorService service = Executors.newFixedThreadPool(5);
+
                 String dump_command = "";
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(project);
                 for(UserProp up : userProps) {
-                    long dumpT2 = System.currentTimeMillis();
-                    System.out.println("table name-----------" + up.getPropName());
-                    LOG.info("start to dump table-----------" + up.getPropName());
-                    Runtime rt = Runtime.getRuntime();
-                    dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + des;
-                    String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
-                    Process process = rt.exec(cmds);
-                    int result = process.waitFor();
-                    if (result != 0)
-                        throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
-                    LOG.info("dump table-----------" + up.getPropName() + "  using: " + (System.currentTimeMillis() - dumpT2) + "ms");
+                    DumpChild dumpChild = new DumpChild(project, up);
+                    service.submit(dumpChild);
 
-                    fileName = des + up.getPropName() + ".txt";
-                    System.out.println("table file name-----------" + fileName);
-//                    fileName = des + up.getPropName() + ".txt";
-                    loadToHBase(fileName, project, up);
                 }
-
+                service.shutdown();
                 LOG.info("End to dump and load database: 16_" + project + ". Using " + (System.currentTimeMillis() - dumpT1) + "ms");
 
             } catch (Exception e) {
@@ -257,6 +219,46 @@ public class LoadMysqlToHbase {
 
         public String getProject() {
             return project;
+        }
+    }
+
+    class DumpChild implements Runnable {
+        private String project;
+        private UserProp up;
+
+        DumpChild(String project, UserProp up) {
+            this.project = project;
+            this.up = up;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String des = Constants.local_path_mysql_dump + project + "/";
+                File dir = new File(des);
+                if(!dir.exists()) {
+                    dir.mkdir();
+                    Runtime.getRuntime().exec("sudo chmod 777 " + des);
+                }
+
+                long dumpT2 = System.currentTimeMillis();
+                System.out.println("table name-----------" + up.getPropName());
+                LOG.info("start to dump table-----------" + up.getPropName());
+                Runtime rt = Runtime.getRuntime();
+                String dump_command = "mysqldump -uxingyun -pOhth3cha --quick --single-transaction -t --databases 16_" + project + " --tables " + up.getPropName() + " --tab=" + des;
+                String[] cmds = new String[]{"/bin/sh", "-c", dump_command};
+                Process process = rt.exec(cmds);
+                int result = process.waitFor();
+                if (result != 0)
+                    throw new RuntimeException("ERROR !!!! dump table " + up.getPropName() + " for " + project + " failed.");
+                LOG.info("dump table-----------" + up.getPropName() + "  using: " + (System.currentTimeMillis() - dumpT2) + "ms");
+
+                String fileName = des + up.getPropName() + ".txt";
+                System.out.println("table file name-----------" + fileName);
+                loadToHBase(fileName, project, up);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
