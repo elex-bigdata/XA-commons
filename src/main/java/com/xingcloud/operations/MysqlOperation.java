@@ -39,6 +39,7 @@ public class MysqlOperation {
             service.submit(new MysqlExecutor(pid));
         }
         service.shutdown();
+        LOG.info(" All finished " );
     }
 
     class MysqlExecutor implements Runnable{
