@@ -57,9 +57,9 @@ public class MysqlOperation {
 
             try {
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
-                List<Integer> uids = getOldUids();
+                List<Long> uids = getOldUids();
 
-                StringBuilder uidSql = new StringBuilder(uids.get(0));
+                StringBuilder uidSql = new StringBuilder(String.valueOf(uids.get(0)));
                 for(int i=1;i<uids.size();i++){
                     uidSql.append(",").append(uids.get(i));
                 }
@@ -86,8 +86,8 @@ public class MysqlOperation {
             }
         }
 
-        public List<Integer> getOldUids(){
-            List<Integer> uids = new ArrayList<Integer>();
+        public List<Long> getOldUids(){
+            List<Long> uids = new ArrayList<Long>();
             Connection conn = null;
             Statement statement = null;
             ResultSet rs = null;
@@ -100,7 +100,7 @@ public class MysqlOperation {
                 statement = conn.createStatement();
                 rs = statement.executeQuery(uidSql);
                 while(rs.next()){
-                    uids.add(rs.getInt("uid"));
+                    uids.add(rs.getLong("uid"));
                 }
                 LOG.info(" load " + pid + " " + " uid finished, cost " + (System.currentTimeMillis() - begin) + "ms, size " + uids.size());
             } catch (SQLException e) {
