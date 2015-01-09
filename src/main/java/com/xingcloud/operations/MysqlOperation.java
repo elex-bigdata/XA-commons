@@ -8,8 +8,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,14 +31,12 @@ public class MysqlOperation {
     }
 
     public void clearOldData() throws SQLException {
-        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
+//        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
+        String[] pids = new String[]{"sof-wpm", "sof-zip"};
 
         ExecutorService service = Executors.newFixedThreadPool(2);
         for(String pid : pids){
-            List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
-            for(UserProp prop: userProps){
-                service.submit(new MysqlExecutor(pid, prop.getPropName()));
-            }
+            service.submit(new MysqlExecutor(pid));
         }
         service.shutdown();
     }
@@ -44,26 +44,39 @@ public class MysqlOperation {
     class MysqlExecutor implements Runnable{
 
         private String pid;
-        private String property;
 
-        public MysqlExecutor(String pid, String property){
+        public MysqlExecutor(String pid){
             this.pid = pid;
-            this.property = property;
         }
 
         @Override
         public void run() {
-            LOG.info(" begin delete " + pid + " " + property );
+            LOG.info(" begin delete " + pid );
             Connection conn = null;
             Statement statement = null;
-            String sql = "delete from " + property + " where uid in (select uid from last_login_time where val < 20140606000000)";
 
-            long begin = System.currentTimeMillis();
             try {
+                List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
+                List<Integer> uids = getOldUids();
+
+                StringBuilder uidSql = new StringBuilder(uids.get(0));
+                for(int i=1;i<uids.size();i++){
+                    uidSql.append(",").append(uids.get(i));
+                }
+
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
                 statement = conn.createStatement();
-                statement.execute(sql);
-                LOG.info(" delete " + pid + " " + property + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
+                for(UserProp prop: userProps){
+                    long begin = System.currentTimeMillis();
+                    if("last_login_time".equals(prop.getPropName())){
+                        continue;
+                    }
+
+                    String sql = "delete from " + prop.getPropName() + " where uid in (" + uidSql.toString() + ")";
+                    statement.execute(sql);
+                    LOG.info(" delete " + pid + " " + prop.getPropName() + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
+                }
+
             } catch (SQLException e) {
                 LOG.error(e.getMessage());
                 e.printStackTrace();
@@ -71,6 +84,34 @@ public class MysqlOperation {
                 DbUtils.closeQuietly(statement);
                 DbUtils.closeQuietly(conn);
             }
+        }
+
+        public List<Integer> getOldUids(){
+            List<Integer> uids = new ArrayList<Integer>();
+            Connection conn = null;
+            Statement statement = null;
+            ResultSet rs = null;
+
+            long begin = System.currentTimeMillis();
+            try {
+                LOG.info(" begin load uid of " + pid );
+                conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
+                String uidSql = "select uid from last_login_time where val < 20140606000000";
+                statement = conn.createStatement();
+                rs = statement.executeQuery(uidSql);
+                while(rs.next()){
+                    uids.add(rs.getInt("uid"));
+                }
+                LOG.info(" load " + pid + " " + " uid finished, cost " + (System.currentTimeMillis() - begin) + "ms");
+            } catch (SQLException e) {
+                LOG.error(e.getMessage());
+                e.printStackTrace();
+            } finally {
+                DbUtils.closeQuietly(statement);
+                DbUtils.closeQuietly(rs);
+                DbUtils.closeQuietly(conn);
+            }
+            return uids;
         }
     }
 
