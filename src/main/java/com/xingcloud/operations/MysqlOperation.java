@@ -31,7 +31,7 @@ public class MysqlOperation {
     public void clearOldData() throws SQLException {
         String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
 
-        ExecutorService service = Executors.newFixedThreadPool(3);
+        ExecutorService service = Executors.newFixedThreadPool(2);
         for(String pid : pids){
             List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
             for(UserProp prop: userProps){
@@ -57,6 +57,7 @@ public class MysqlOperation {
             Connection conn = null;
             Statement statement = null;
             String sql = "delete from " + property + " where uid in (select uid from last_login_time where val < 20140606000000)";
+
             long begin = System.currentTimeMillis();
             try {
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
