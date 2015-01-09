@@ -102,7 +102,7 @@ public class MysqlOperation {
                 while(rs.next()){
                     uids.add(rs.getInt("uid"));
                 }
-                LOG.info(" load " + pid + " " + " uid finished, cost " + (System.currentTimeMillis() - begin) + "ms");
+                LOG.info(" load " + pid + " " + " uid finished, cost " + (System.currentTimeMillis() - begin) + "ms, size " + uids.size());
             } catch (SQLException e) {
                 LOG.error(e.getMessage());
                 e.printStackTrace();
