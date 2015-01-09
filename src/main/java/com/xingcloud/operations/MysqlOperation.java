@@ -31,7 +31,7 @@ public class MysqlOperation {
     public void clearOldData() throws SQLException {
         String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
 
-        ExecutorService service = Executors.newFixedThreadPool(5);
+        ExecutorService service = Executors.newFixedThreadPool(3);
         for(String pid : pids){
             List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
             for(UserProp prop: userProps){
