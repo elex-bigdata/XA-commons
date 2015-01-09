@@ -53,6 +53,7 @@ public class MysqlOperation {
 
         @Override
         public void run() {
+            LOG.info(" begin delete " + pid + " " + property );
             Connection conn = null;
             Statement statement = null;
             String sql = "delete from " + property + " where uid in (select uid from last_login_time where val < 20140606000000)";
