@@ -61,7 +61,6 @@ public class MysqlOperation {
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
                 statement = conn.createStatement();
                 statement.execute(sql);
-                conn.commit();
                 LOG.info(" delete " + pid + " " + property + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
             } catch (SQLException e) {
                 LOG.error(e.getMessage());
