@@ -32,7 +32,7 @@ public class MysqlOperation {
 
     public void clearOldData() throws SQLException {
 //        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
-        String[] pids = new String[]{"sof-wpm", "sof-zip"};
+        String[] pids = new String[]{"sof-windowspm", "quick-start"};
 
         ExecutorService service = Executors.newFixedThreadPool(2);
         for(String pid : pids){
