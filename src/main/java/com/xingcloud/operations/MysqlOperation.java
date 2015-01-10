@@ -87,8 +87,17 @@ public class MysqlOperation {
                         String sql = "delete from " + prop.getPropName() + " where uid in (" + batch + ")";
                         statement.execute(sql);
                         LOG.info("delete batch " + i + " " + prop.getPropName());
+                        i++;
                     }
                     LOG.info(" delete " + pid + " " + prop.getPropName() + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
+                }
+
+                int i = 0;
+                for(String batch : sqls) {
+                    String sql = "delete from last_login_time where uid in (" + batch + ")";
+                    statement.execute(sql);
+                    LOG.info("delete batch " + i + " last_login_time");
+                    i++;
                 }
 
             } catch (SQLException e) {
