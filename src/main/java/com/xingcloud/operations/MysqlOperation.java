@@ -60,10 +60,19 @@ public class MysqlOperation {
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
                 List<Long> uids = getOldUids();
 
-                StringBuilder uidSql = new StringBuilder(String.valueOf(uids.get(0)));
-                for(int i=1;i<uids.size();i++){
-                    uidSql.append(",").append(uids.get(i));
+                List<String> sqls = new ArrayList<String>();
+                StringBuilder uidSql = null;
+                for(int i=0;i<uids.size();i++){
+                    if(i % 10000 == 0){
+                        if(uidSql != null){
+                            sqls.add(uidSql.toString());
+                        }
+                        uidSql = new StringBuilder(String.valueOf(uids.get(i)));
+                    }else {
+                        uidSql.append(",").append(uids.get(i));
+                    }
                 }
+                sqls.add(uidSql.toString());
 
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
                 statement = conn.createStatement();
@@ -73,8 +82,10 @@ public class MysqlOperation {
                         continue;
                     }
 
-                    String sql = "delete from " + prop.getPropName() + " where uid in (" + uidSql.toString() + ")";
-                    statement.execute(sql);
+                    for(String batch : sqls) {
+                        String sql = "delete from " + prop.getPropName() + " where uid in (" + batch + ")";
+                        statement.execute(sql);
+                    }
                     LOG.info(" delete " + pid + " " + prop.getPropName() + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
                 }
 
