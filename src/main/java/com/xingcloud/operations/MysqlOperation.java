@@ -82,9 +82,11 @@ public class MysqlOperation {
                         continue;
                     }
 
+                    int i = 0;
                     for(String batch : sqls) {
                         String sql = "delete from " + prop.getPropName() + " where uid in (" + batch + ")";
                         statement.execute(sql);
+                        LOG.info("delete batch " + i + " " + prop.getPropName());
                     }
                     LOG.info(" delete " + pid + " " + prop.getPropName() + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
                 }
