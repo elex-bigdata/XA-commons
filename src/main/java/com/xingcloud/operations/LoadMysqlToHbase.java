@@ -41,8 +41,10 @@ public class LoadMysqlToHbase {
         LoadMysqlToHbase lmth = new LoadMysqlToHbase();
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
-        projects.add("sof-installer");
-        String cmd = args[0];
+
+        String pro = args[0];
+        String cmd = args[1];
+        projects.add(pro);
         if (cmd.equals("load")) {
             lmth.load(projects);
         } else if(cmd.equals("test")) {
@@ -255,7 +257,7 @@ public class LoadMysqlToHbase {
 
                 String fileName = des + up.getPropName() + ".txt";
                 System.out.println("table file name-----------" + fileName);
-                loadToHBase(fileName, project, up);
+//                loadToHBase(fileName, project, up);
             } catch (Exception e) {
                 e.printStackTrace();
             }

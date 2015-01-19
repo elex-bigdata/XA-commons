@@ -33,7 +33,8 @@ public class MysqlOperation {
     public void clearOldData() throws SQLException {
 //        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
 //        String[] pids = new String[]{"sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd"};
-        String[] pids = new String[]{"i18n-status", "web337", "lignting-speeddial", "sof-dsk"};
+//        String[] pids = new String[]{"i18n-status", "web337", "lignting-speeddial", "sof-dsk"};
+        String[] pids = new String[]{"sof-installer"};
 
         ExecutorService service = Executors.newFixedThreadPool(1);
         for(String pid : pids){
@@ -120,7 +121,7 @@ public class MysqlOperation {
             try {
                 LOG.info(" begin load uid of " + pid );
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
-                String uidSql = "select uid from last_login_time where val < 20140910000000";
+                String uidSql = "select uid from last_login_time where val < 20141020000000";
                 statement = conn.createStatement();
                 rs = statement.executeQuery(uidSql);
                 while(rs.next()){
