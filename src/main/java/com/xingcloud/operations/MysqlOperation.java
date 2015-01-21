@@ -60,7 +60,7 @@ public class MysqlOperation {
         public MysqlExecutor(String pid, String keepTime){
             this.pid = pid;
             this.keepTime = keepTime;
-            this.fileName = Constants.deleted_uids_path + pid + ".txt";
+            this.fileName = Constants.deleted_uids_path + pid + "/" + DateManager.getDaysBefore(0, 0) + ".txt";
         }
 
         @Override
@@ -136,7 +136,7 @@ public class MysqlOperation {
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
                 String time = null;
                 if (keepTime.equals(Constants.KEEP_3_MONTH)) {
-                    time = DateManager.getDateTime(90);
+                    time = DateManager.getDateTime(95);
                 } else if (keepTime.equals(Constants.KEEP_6_MONTH)) {
                     time = DateManager.getDateTime(180);
                 }
@@ -171,7 +171,7 @@ public class MysqlOperation {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
 
                 for(Long uid : uids) {
-                    bw.write(String.valueOf(uid));
+                    bw.write(String.valueOf(uid) + "\n");
                 }
 
             }catch (IOException e) {
