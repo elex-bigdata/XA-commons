@@ -22,4 +22,10 @@ public class Constants {
     public static boolean TableWalSwitch = false;
 
     public static String local_path_mysql_dump = "/data2/mysqldump/";
+
+    public static String deleted_uids_path = "/data2/deleted/";
+
+    public static final String KEEP_3_MONTH = "3";
+
+    public static final String KEEP_6_MONTH = "6";
 }

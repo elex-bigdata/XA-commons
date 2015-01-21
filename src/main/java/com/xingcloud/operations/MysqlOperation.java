@@ -3,10 +3,16 @@ package com.xingcloud.operations;
 import com.xingcloud.mysql.MySqlResourceManager;
 import com.xingcloud.mysql.MySql_16seqid;
 import com.xingcloud.mysql.UserProp;
+import com.xingcloud.operations.utils.Constants;
+import com.xingcloud.operations.utils.DateManager;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,14 +37,15 @@ public class MysqlOperation {
     }
 
     public void clearOldData() throws SQLException {
-//        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start"};
-//        String[] pids = new String[]{"sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd"};
-//        String[] pids = new String[]{"i18n-status", "web337", "lignting-speeddial", "sof-dsk", "sof-installer"};
-        String[] pids = new String[]{"sof-installer"};
+        String[] pids_6M = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd"};
+        String[] pids_3M = new String[]{"i18n-status", "web337", "lignting-speeddial", "sof-dsk", "sof-installer"};
 
-        ExecutorService service = Executors.newFixedThreadPool(1);
-        for(String pid : pids){
-            service.submit(new MysqlExecutor(pid));
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        for(String pid : pids_6M){
+            service.submit(new MysqlExecutor(pid, Constants.KEEP_6_MONTH));
+        }
+        for(String pid : pids_3M){
+            service.submit(new MysqlExecutor(pid, Constants.KEEP_3_MONTH));
         }
         service.shutdown();
         LOG.info(" All finished " );
@@ -47,9 +54,13 @@ public class MysqlOperation {
     class MysqlExecutor implements Runnable{
 
         private String pid;
+        private String keepTime;
+        private String fileName;
 
-        public MysqlExecutor(String pid){
+        public MysqlExecutor(String pid, String keepTime){
             this.pid = pid;
+            this.keepTime = keepTime;
+            this.fileName = Constants.deleted_uids_path + pid + ".txt";
         }
 
         @Override
@@ -60,7 +71,9 @@ public class MysqlOperation {
 
             try {
                 List<UserProp> userProps = MySqlResourceManager.getInstance().getUserPropsFromLocal(pid);
-                List<Long> uids = getOldUids();
+                List<Long> uids = getOldUids(keepTime);
+
+                writeToFile(uids);
 
                 List<String> sqls = new ArrayList<String>();
                 StringBuilder uidSql = null;
@@ -111,7 +124,7 @@ public class MysqlOperation {
             }
         }
 
-        public List<Long> getOldUids(){
+        public List<Long> getOldUids(String keepTime){
             List<Long> uids = new ArrayList<Long>();
             Connection conn = null;
             Statement statement = null;
@@ -121,7 +134,14 @@ public class MysqlOperation {
             try {
                 LOG.info(" begin load uid of " + pid );
                 conn = MySql_16seqid.getInstance().getConnLocalNode(pid);
-                String uidSql = "select uid from last_login_time where val < 20141020000000";
+                String time = null;
+                if (keepTime.equals(Constants.KEEP_3_MONTH)) {
+                    time = DateManager.getDateTime(90);
+                } else if (keepTime.equals(Constants.KEEP_6_MONTH)) {
+                    time = DateManager.getDateTime(180);
+                }
+                String uidSql = "select uid from last_login_time where val < " + time;
+
                 statement = conn.createStatement();
                 rs = statement.executeQuery(uidSql);
                 while(rs.next()){
@@ -137,6 +157,26 @@ public class MysqlOperation {
                 DbUtils.closeQuietly(conn);
             }
             return uids;
+        }
+
+        public void writeToFile(List<Long> uids) {
+            try {
+                File file = new File(fileName);
+
+                if(!file.getParentFile().exists()) {
+                    if(!file.getParentFile().mkdirs()) {
+                        System.out.println("fail to create File！");
+                    }
+                }
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+
+                for(Long uid : uids) {
+                    bw.write(String.valueOf(uid));
+                }
+
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

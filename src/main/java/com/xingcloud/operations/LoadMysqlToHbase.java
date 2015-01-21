@@ -42,6 +42,11 @@ public class LoadMysqlToHbase {
 //        List<String> projects = lmth.getAllProjects();
         List<String> projects = new ArrayList<String>();
 
+        if(args.length != 2){
+            System.out.println("need input tow args.");
+            System.exit(-1);
+        }
+
         String pro = args[0];
         String cmd = args[1];
         projects.add(pro);
