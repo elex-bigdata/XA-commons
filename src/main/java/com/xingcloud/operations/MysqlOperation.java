@@ -160,6 +160,7 @@ public class MysqlOperation {
         }
 
         public void writeToFile(List<Long> uids) {
+            BufferedWriter bw = null;
             try {
                 File file = new File(fileName);
 
@@ -168,14 +169,20 @@ public class MysqlOperation {
                         System.out.println("fail to create File！");
                     }
                 }
-                BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+                bw = new BufferedWriter(new FileWriter(file, true));
 
                 for(Long uid : uids) {
                     bw.write(String.valueOf(uid) + "\n");
                 }
 
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
