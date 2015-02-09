@@ -8,5 +8,5 @@ host=`echo ${hostliststr}|awk '{split($1,a,",");for(key in a)print a[key];}'`
 for node in ${host}
 do
     echo ${node}
-#    `scp ${src} ${node}:${des}`
+    `scp ${src} ${node}:${des}`
 done

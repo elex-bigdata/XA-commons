@@ -125,7 +125,7 @@ public class DateManager {
     }
 
     public static void main(String[] args) throws Exception{
-        System.out.println(getDateTime(90));
+        System.out.println(getDateTime(95));
         System.out.println(getDateTime(180));
     }
 }
