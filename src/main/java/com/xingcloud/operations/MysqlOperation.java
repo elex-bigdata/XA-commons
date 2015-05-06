@@ -37,8 +37,8 @@ public class MysqlOperation {
     }
 
     public void clearOldData() throws SQLException {
-        String[] pids_6M = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd"};
-        String[] pids_3M = new String[]{"i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer"};
+        String[] pids_6M = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd"};
+        String[] pids_3M = new String[]{"i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer", "quick-start", "omiga-plus", "webssearches", "sweet-page", "infospace"};
 
         ExecutorService service = Executors.newFixedThreadPool(2);
         for(String pid : pids_6M){
