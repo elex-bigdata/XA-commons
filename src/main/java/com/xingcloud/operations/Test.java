@@ -26,13 +26,14 @@ public class Test {
         int count = 0;
         try {
             for(FileStatus fileStatus: fs.listStatus(new Path(FIX_PATH))){
-                if(fileStatus.isFile() && count < 5) {
+                if(fileStatus.isFile() && count++ < 5) {
                     Path path = fileStatus.getPath();
                     in = fs.open(path);
                     IOUtils.copyBytes(in, System.out, 4096, false);
                 } else {
                     break;
                 }
+
             }
         } finally {
             IOUtils.closeStream(in);
