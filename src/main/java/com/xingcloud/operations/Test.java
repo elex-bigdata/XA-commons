@@ -7,7 +7,9 @@ import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 
@@ -23,20 +25,30 @@ public class Test {
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(URI.create(FIX_PATH), conf);
         InputStream in = null;
+        BufferedReader br = null;
         int count = 0;
         try {
             for(FileStatus fileStatus: fs.listStatus(new Path(FIX_PATH))){
                 if(fileStatus.isFile() && count++ < 5) {
                     Path path = fileStatus.getPath();
                     in = fs.open(path);
-                    IOUtils.copyBytes(in, System.out, 4096, false);
+                    br = new BufferedReader(new InputStreamReader(in));
+                    String line = null;
+                    while((line = br.readLine()) != null) {
+                        System.out.println(line + "hhhhhh");
+                    }
+//                    IOUtils.copyBytes(in, System.out, 4096, false);
                 } else {
                     break;
                 }
 
             }
         } finally {
-            IOUtils.closeStream(in);
+//            IOUtils.closeStream(in);
+            if(br != null)
+                br.close();
+            if(in != null)
+                in.close();
         }
 
     }
