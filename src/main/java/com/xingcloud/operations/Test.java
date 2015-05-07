@@ -14,7 +14,7 @@ import java.net.URL;
  * Created by wanghaixing on 15-5-7.
  */
 public class Test {
-    public static String HDFS_PATH = "hdfs://ELEX-LA-WEB1/user/hadoop/stream_log/pid/2015-05-06/22apple";
+    public static String HDFS_PATH = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/stream_log/pid/2015-05-06/22apple";
 
     static {
         URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
