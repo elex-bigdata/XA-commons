@@ -18,7 +18,7 @@ public class Test {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("helllllllll");
+        System.out.println("helllllllllll");
         URL url = new URL(HDFS_PATH);
         InputStream in = url.openStream();
 //        OutputStream out =
