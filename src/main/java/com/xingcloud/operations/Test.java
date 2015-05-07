@@ -35,7 +35,8 @@ public class Test {
                     br = new BufferedReader(new InputStreamReader(in));
                     String line = null;
                     while((line = br.readLine()) != null) {
-                        System.out.println(line + "hhhhhh");
+                        line = line.split("\t")[1];
+                        System.out.println(line);
                     }
 //                    IOUtils.copyBytes(in, System.out, 4096, false);
                 } else {
