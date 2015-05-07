@@ -22,16 +22,21 @@ public class Test {
 
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(URI.create(FIX_PATH), conf);
-        for(FileStatus fileStatus: fs.listStatus(new Path(FIX_PATH))){
-            Path path = fileStatus.getPath();
-            System.out.println(path);
-        }
-        /*InputStream in = null;
+        InputStream in = null;
+        int count = 0;
         try {
-            in = fs.open(new Path(HDFS_PATH));
-            IOUtils.copyBytes(in, System.out, 4096, false);
+            for(FileStatus fileStatus: fs.listStatus(new Path(FIX_PATH))){
+                if(fileStatus.isFile() && count < 5) {
+                    Path path = fileStatus.getPath();
+                    in = fs.open(path);
+                    IOUtils.copyBytes(in, System.out, 4096, false);
+                } else {
+                    break;
+                }
+            }
         } finally {
             IOUtils.closeStream(in);
-        }*/
+        }
+
     }
 }
