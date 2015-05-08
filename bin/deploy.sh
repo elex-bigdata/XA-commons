@@ -45,5 +45,5 @@ do
 	echo ${node}
     echo ${dist}/${jar} ${node}${runJar}/${testjar}
 	scp  ${dist}/${jar} ${node}:${runJar}/${testjar}
-	scp  ${dist}/${loadscript} ${node}:${scriptDir}/
+	scp  ${script}/${loadscript} ${node}:${scriptDir}/
 done
