@@ -66,4 +66,7 @@ if __name__ == '__main__':
     print 'Total task num: ' + str(total_dump_task) + "\n"
 
     for i in range(thread_num):
+        queue_load_to_hdfs.put('exit')
+
+    for i in range(thread_num):
         loadLocalFileToHDFSWorker(host, queue_load_to_hdfs, date).start()
