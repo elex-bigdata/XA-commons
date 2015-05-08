@@ -7,8 +7,11 @@ import com.xingcloud.uidtransform.HbaseMysqlUIDTruncator;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
 
 import java.io.*;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,6 +25,7 @@ import java.util.concurrent.Executors;
  */
 public class IdMapOperation {
     private static final Log LOG = LogFactory.getLog(IdMapOperation.class);
+    public static String FIX_PATH = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/deleted_idmap/";
 
     private String date;
     public static int THREAD_NUM = 1;
@@ -54,11 +58,13 @@ public class IdMapOperation {
     //  /data2/deleted/web337/2015-02-28.txt
     class IdMapExecutor implements Runnable {
         private String pid;
+        private String date;
         private String fileName;
 
         public IdMapExecutor(String pid, String date) {
             this.pid = pid;
-            this.fileName = Constants.deleted_uids_path + pid + "/" + date + ".txt";
+            this.date = date;
+//            this.fileName = Constants.deleted_uids_path + pid + "/" + date + ".txt";
         }
 
         @Override
@@ -67,7 +73,7 @@ public class IdMapOperation {
             long begin = System.currentTimeMillis();
             Connection conn = null;
             Statement statement = null;
-            List<String> uids = readFromFile(fileName);
+            List<String> uids = getDeletedUids(pid, date);
             List<String> ids = translate(uids);
             try {
                 List<String> sqls = new ArrayList<String>();
@@ -119,7 +125,45 @@ public class IdMapOperation {
             return truncUids;
         }
 
-        public List<String> readFromFile(String fileName) {
+        public List<String> getDeletedUids(String pid, String date) {
+            List<String> uids = new ArrayList<String>();
+            Configuration conf = new Configuration();
+            InputStream in = null;
+            BufferedReader br = null;
+            try {
+                String pidPath = FIX_PATH + pid + "/" + date;
+                FileSystem fs = FileSystem.get(URI.create(FIX_PATH), conf);
+                for(FileStatus fileStatus: fs.listStatus(new Path(pidPath))){
+                    if(fileStatus.isFile()) {
+                        Path path = fileStatus.getPath();
+                        in = fs.open(path);
+                        br = new BufferedReader(new InputStreamReader(in));
+                        String line = null;
+                        while((line = br.readLine()) != null) {
+                            uids.add(line);
+                        }
+                    } else {
+                        break;
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (br != null)
+                        br.close();
+                    if(in != null)
+                        in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return uids;
+        }
+
+        /*public List<String> readFromFile(String fileName) {
             List<String> uids = new ArrayList<String>();
             BufferedReader br = null;
             try {
@@ -143,7 +187,7 @@ public class IdMapOperation {
             }
 
             return uids;
-        }
+        }*/
     }
 
 
