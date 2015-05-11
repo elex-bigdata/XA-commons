@@ -43,7 +43,7 @@ public class IdMapOperation {
     public void clearOldData(String date) throws SQLException {
         //要定期删除的项目
         String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd",
-                "i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "webssearches", "sweet-page", "infospace", "delta-homes"};
+                "i18n-status", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "sweet-page", "delta-homes"};
 
         THREAD_NUM = pids.length;
         ExecutorService service = Executors.newFixedThreadPool(THREAD_NUM);
