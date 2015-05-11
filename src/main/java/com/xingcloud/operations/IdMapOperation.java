@@ -28,7 +28,7 @@ public class IdMapOperation {
     public static String FIX_PATH = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/deleted_idmap/";
 
     private String date;
-    public static int THREAD_NUM = 1;
+    public static int THREAD_NUM = 5;
 
     public static void main(String[] args) throws SQLException {
         String date = args[0];
@@ -43,9 +43,9 @@ public class IdMapOperation {
     public void clearOldData(String date) throws SQLException {
         //要定期删除的项目
         String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd",
-                "i18n-status", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "sweet-page", "delta-homes"};
+                "i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "webssearches", "sweet-page", "infospace", "delta-homes"};
 
-        THREAD_NUM = pids.length;
+//        THREAD_NUM = pids.length;
         ExecutorService service = Executors.newFixedThreadPool(THREAD_NUM);
         for(String pid : pids){
             service.submit(new IdMapExecutor(pid, date));
@@ -96,7 +96,7 @@ public class IdMapOperation {
                 for(String batch : sqls) {
                     String sql = "delete from `vf_" + pid + "`.`id_map` where id in (" + batch + ")";
                     statement.execute(sql);
-                    LOG.info("delete + <" + pid + "> batch " + i + " ...");
+                    LOG.info("delete <" + pid + "> batch " + i + " ...");
                     i++;
                 }
                 LOG.info(" delete " + pid + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
