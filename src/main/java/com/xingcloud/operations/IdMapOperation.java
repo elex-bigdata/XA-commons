@@ -94,9 +94,9 @@ public class IdMapOperation {
                 statement = conn.createStatement();
                 int i = 0;
                 for(String batch : sqls) {
-                    String sql = "delete from vf_" + pid + ".id_map where id in (" + batch + ")";
+                    String sql = "delete from `vf_" + pid + "`.`id_map` where id in (" + batch + ")";
                     statement.execute(sql);
-                    LOG.info("delete batch " + i + " ...");
+                    LOG.info("delete + <" + pid + "> batch " + i + " ...");
                     i++;
                 }
                 LOG.info(" delete " + pid + " finished cost " + (System.currentTimeMillis() - begin) + "ms");
