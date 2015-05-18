@@ -72,8 +72,8 @@ class Deleter implements Runnable {
             scan.setMaxVersions();
         }else{
             scan.setMaxVersions(1);
-            scan.setFilter(new KeyOnlyFilter());
         }
+        scan.setFilter(new KeyOnlyFilter());
         scan.setCaching(10000);
 
         HTable table = null;
