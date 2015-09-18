@@ -28,4 +28,14 @@ public class Constants {
     public static final String KEEP_3_MONTH = "3";
 
     public static final String KEEP_6_MONTH = "6";
+
+    public static final String COLUMNFAMILY = "val";
+
+    public static final int HALF_YEAR = 15768000;
+
+    public static final int THREE_MONTH = 8035200;
+
+    public static final String DELETE = "delete";
+
+    public static final String SET_TTL = "TTL";
 }

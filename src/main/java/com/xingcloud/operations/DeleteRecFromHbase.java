@@ -1,5 +1,6 @@
 package com.xingcloud.operations;
 
+import com.xingcloud.operations.utils.Log4jProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -18,10 +19,12 @@ import java.util.concurrent.*;
  */
 
 public class DeleteRecFromHbase {
+
     private static final Log LOG = LogFactory.getLog(DeleteRecFromHbase.class);
     private static boolean maxVersion = false;
 
     public static void main(String[] args) throws Exception{
+        Log4jProperties.init();
         String pid = args[0];
         String startKey = args[1];
         String endKey = args[2];
@@ -39,6 +42,8 @@ public class DeleteRecFromHbase {
     }
 
 }
+
+
 
 class Deleter implements Runnable {
     private static final Log LOG = LogFactory.getLog(Deleter.class);

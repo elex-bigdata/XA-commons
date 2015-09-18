@@ -42,8 +42,20 @@ public class IdMapOperation {
 
     public void clearOldData(String date) throws SQLException {
         //要定期删除的项目
-        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd",
-                "i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "webssearches", "sweet-page", "infospace", "delta-homes"};
+//        String[] pids = new String[]{"sof-wpm", "sof-zip", "sof-windowspm", "quick-start","sof-ient", "sof-newgdp", "sof-newgdppop", "sof-yacnvd",
+//                "i18n-status", "web337", "lightning-speedial", "sof-dsk", "sof-installer", "omiga-plus", "webssearches", "sweet-page", "infospace", "delta-homes"};
+
+        String[] pids = new String[]{"22apple","22find","ttsgames","aartemis","awesomehp","cok_337","delta-homes","sof-dp","sof-dsk","dosearches","sof-hpprotect","sof-everything","fishao",
+                "gdp","sof-gdp","sof-seed","sof-ss","v9-gp","hot-finder","ie-lightning-speed","sof-ient","sof-isafe","isearch123","istart123","istartpageing","istartsurf",
+                "key-find","lightning-newtab","lightning-speedial","lightningnt","lightning-speed-dial","luckybeginning","luckysearches","sof-macinstaller","myoivu",
+                "mystartsearch","myv9","nationzoom","newgag","newgdppop","newtab-all","newtab2","internet-3","ordt","omiga-plus","omniboxes","oursurfing","sof-picexa-dl",
+                "sof-px","portaldosites","qone8","qone8search","qvo6","raydownload","safehomepage","sof-pbd-dl","sof-wzp-dl","sof-yacbndl","sof-zbd-dl","sweet-page","v9",
+                "v9m","v9search","vi-view","wartune-en","web337","webssearches","sof-zip","sof-wzpdl","sof-wpm","sof-wxz","www-337-com","lightningnewtab","yac-error-page",
+                "xa-xbb","yac-newdl","sof-yacnvd","yoursearching","websupport","shenqu","maomaomei","kjsg","xzqz","livepoolpro","desertoperations","wargame1942","generalsofwar",
+                "monkeyking","darkorbit","loa","myfreezoo","mlf","farmerama","drakensang","piratestorm","guardiaoonline","dragon-pals","hog","cuponkit","cuponkit-ext","unnamedsoft",
+                "unsoftnvd","chhp-unistallmaster","chhp-myoivu","prote-ff-extension","sof-installer","sof-newgdppop","qtype","qtyper","quick-sidebar","quick-start","searchprotect",
+                "usv9","jiggybonga","xlfc","xlfc-cbnc","yzzt","csbhtw","kszl","ddt","gcld","gcld","gs","age","age2","agei","agei2","aoerts","ram","ba2","cok","cokfb","happyfarm",
+                "coktw","cokmi","thor","rafo","firefox-searchengine","gggggg","do-search","wuzijing","unextnvd"};
 
 //        THREAD_NUM = pids.length;
         ExecutorService service = Executors.newFixedThreadPool(THREAD_NUM);
