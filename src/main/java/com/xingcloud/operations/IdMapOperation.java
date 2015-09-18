@@ -28,7 +28,7 @@ public class IdMapOperation {
     public static String FIX_PATH = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/deleted_idmap/";
 
     private String date;
-    public static int THREAD_NUM = 5;
+    public static int THREAD_NUM = 10;
 
     public static void main(String[] args) throws SQLException {
         String date = args[0];
