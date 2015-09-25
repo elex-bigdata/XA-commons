@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root>
+    <projects>
+        <keep_time>3</keep_time>
+        <pro>quick-start,sof-ient,sof-newgdp,sof-wpm,security-protection</pro>
+    </projects>
+
+    <projects>
+        <keep_time>6</keep_time>
+        <pro>sof-zip</pro>
+    </projects>
+
+
+</Root>
