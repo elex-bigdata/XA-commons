@@ -104,9 +104,11 @@ class AlterTable implements Runnable {
                     LOG.info("begin set table TTL:  " + tableName + "  on " + node);
                     System.out.println("begin set table TTL:  " + tableName + "  on " + node);
                     admin.disableTable(tableName);
-                    HColumnDescriptor family = new HColumnDescriptor(Constants.COLUMNFAMILY);
+                    tableDescripter = admin.getTableDescriptor(tableName.getBytes());
+                    HColumnDescriptor family = tableDescripter.getFamily(Constants.COLUMNFAMILY.getBytes());
                     family.setTimeToLive(Constants.THREE_MONTH);
                     admin.enableTable(tableName);
+                    System.out.println("OK");
                 }
             } else if (op.equals(Constants.DELETE)) {
                 for(String pro : proList) {
