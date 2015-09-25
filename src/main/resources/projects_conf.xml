@@ -2,12 +2,12 @@
 <Root>
     <projects>
         <keep_time>3</keep_time>
-        <pro>quick-start,sof-ient,sof-newgdp,sof-wpm,security-protection</pro>
+        <pro>quick-start</pro>
     </projects>
 
     <projects>
         <keep_time>6</keep_time>
-        <pro>sof-zip</pro>
+        <pro>sof-zip,sof-ient,sof-newgdp,sof-wpm,security-protection</pro>
     </projects>
 
 

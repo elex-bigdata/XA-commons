@@ -50,14 +50,11 @@ public class HbaseOperation {
         HbaseOperation ho = new HbaseOperation();
         List<String> proList = ho.time_pros.get("3");
 
-        for(String pid : proList) {
-            System.out.println(pid);
-        }
 
-        /*ExecutorService service = Executors.newFixedThreadPool(16);
+        ExecutorService service = Executors.newFixedThreadPool(16);
         for(int n = 0 ; n < 16; n++) {
             service.execute(new AlterTable("node" + n, proList, Constants.SET_TTL));
-        }*/
+        }
     }
 
     /*public void setTTL(List<String> proList, String op) {
