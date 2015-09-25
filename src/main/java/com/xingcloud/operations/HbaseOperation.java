@@ -55,6 +55,7 @@ public class HbaseOperation {
         for(int n = 0 ; n < 16; n++) {
             service.execute(new AlterTable("node" + n, proList, Constants.SET_TTL));
         }
+        service.shutdown();
     }
 
     /*public void setTTL(List<String> proList, String op) {
