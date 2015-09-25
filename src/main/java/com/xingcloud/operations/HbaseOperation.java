@@ -88,6 +88,7 @@ class AlterTable implements Runnable {
     @Override
     public void run() {
         LOG.info("begin process hbase records on " + node + "...");
+        System.out.println("begin process hbase records on " + node + "...");
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", node);
         conf.set("hbase.zookeeper.property.clientPort", "3181");
@@ -100,6 +101,7 @@ class AlterTable implements Runnable {
                 for(String pro : proList) {
                     tableName = "deu_" + pro;
                     LOG.info("begin set table TTL:  " + tableName + "  on " + node);
+                    System.out.println("begin set table TTL:  " + tableName + "  on " + node);
                     admin.disableTable(tableName);
                     HColumnDescriptor family = new HColumnDescriptor(Constants.COLUMNFAMILY);
                     family.setTimeToLive(Constants.THREE_MONTH);
@@ -120,8 +122,10 @@ class AlterTable implements Runnable {
         } catch (IOException e) {
             LOG.error("process table: " + tableName + " failed on " + node);
             LOG.error(e.getMessage());
+            System.out.println("process table: " + tableName + " failed on " + node);
         }
         LOG.info("end process hbase records on " + node + "...");
+        System.out.println("end process hbase records on " + node + "...");
     }
 }
 
