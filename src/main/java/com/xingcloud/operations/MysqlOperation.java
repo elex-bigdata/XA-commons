@@ -34,17 +34,19 @@ public class MysqlOperation {
     public static void main(String[] args) throws SQLException {
         String[] pids_a1 = new String[]{"22apple","22find","ttsgames","aartemis","awesomehp","cok337","delta-homes","sof-dp","sof-dsk","dosearches","sof-hpprotect","sof-everything","fishao",
                 "gdp","sof-gdp","sof-seed","sof-ss","v9-gp","hot-finder","ie-lightning-speed","sof-ient","sof-isafe","isearch123","istart123","istartpageing","istartsurf",
-                "key-find","lightning-newtab","lightning-speedial","lightning-speed-dial","luckybeginning","luckysearches","sof-macinstaller","myoivu",
-                "mystartsearch","myv9","nationzoom","newgag","newtab2","ordt","omiga-plus","omniboxes","oursurfing","sof-picexa-dl",
+                "key-find","lightning-newtab","lightning-speedial","lightning-speed-dial","luckybeginning","luckysearches","sof-macinstaller","myoivu","ooxxsearch",
+                "mystartsearch","myv9","nationzoom","newgag","newtab2","ordt","omiga-plus","omniboxes","oursurfing","sof-picexa-dl","webpageing","istartpage123","govome",
                 "sof-px","portaldosites","qone8","qone8search","qvo6","raydownload","safehomepage","sof-pbd-dl","sof-wzp-dl","sof-yacbndl","sof-zbd-dl","sweet-page","v9",
-                "v9m","v9search","vi-view","wartune-en","web337","webssearches","sof-zip"};
+                "v9m","v9search","vi-view","wartune-en","web337","webssearches","sof-zip","mysites123","mysurfing123","crxbro","ghokswa","rafonvd","uninstallmaster","sofclean",
+                "report"};
 
-        String[] pids_a2 = new String[]{"sof-wzpdl","sof-wpm","sof-wxz","www-337-com","lightningnewtab",
+        String[] pids_a2 = new String[]{"sof-wzpdl","sof-wpm","sof-wxz","www-337-com","lightningnewtab","datazip","gggggg2","didisearch","qksee","winzippers","search2000s",
                 "xa-xbb","yac-newdl","sof-yacnvd","yoursearching","websupport","shenqu","maomaomei","kjsg","xzqz","livepoolpro","desertoperations","wargame1942","generalsofwar",
                 "monkeyking","darkorbit","loa","myfreezoo","mlf","farmerama","drakensang","piratestorm","guardiaoonline","dragon-pals","hog","cuponkit","cuponkit-ext","unnamedsoft",
                 "unsoftnvd","chhp-unistallmaster","chhp-myoivu","prote-ff-extension","sof-installer","sof-newgdppop","qtype","qtyper","quick-sidebar","quick-start","searchprotect",
                 "usv9","jiggybonga","xlfc","xlfc-cbnc","yzzt","csbhtw","kszl","ddt","gcld","gcld","gs","age","age2","agei","agei2","aoerts","ram","ba2","cok","cokfb","happyfarm",
-                "coktw","cokmi","thor","rafo","firefox-searchengine","gggggg","do-search","wuzijing","unextnvd"};
+                "coktw","cokmi","thor","rafo","firefox-searchengine","gggggg","do-search","wuzijing","unextnvd","yoursites123","surfpageing","chroomium","gggggg3","ggggggsite3",
+                "sof-dloadsw"};
 
         String[] pids_all = null;
         if(args.length == 1) {
